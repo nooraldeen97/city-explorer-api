@@ -1,13 +1,14 @@
 const express = require('express');
 const server = express(); //I can use the express methods using server variable
 const weatherData = require('./data/weather.json');
+require('dotenv').config();
 const cors = require('cors');
 server.use(cors()); //make my server opened for everyone
 
-const PORT = 3001;
+const PORT = process.env.PORT;
 
-//localhost:3001/
-server.get('/',(req,res)=>{
+//localhost:3001/test
+server.get('/test',(req,res)=>{
     res.send('hello from back-end repo');
 })
 
@@ -25,10 +26,10 @@ class Forecast {
 server.get('/weather',(req,res)=>{
 
     let searchQuery = req.query.searchQuery;
-    let lat = req.query.latitude;
-    let lon = req.query.longitudinal;
+    // let lat = req.query.latitude;
+    // let lon = req.query.longitudinal;
 let dataForWeather= weatherData.find((item)=>{
-    if(item.city_name.toLocaleLowerCase() == searchQuery.toLowerCase() && lat == item.lat && lon == item.lon)
+    if(item.city_name.toLocaleLowerCase() == searchQuery.toLowerCase())
 
         return (item);
     
