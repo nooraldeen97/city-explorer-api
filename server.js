@@ -7,6 +7,10 @@ server.use(cors()); //make my server opened for everyone
 
 const PORT = process.env.PORT;
 
+server.get('/',(req,res)=>{
+    res.send('hello from home page ');
+})
+
 //localhost:3001/test
 server.get('/test',(req,res)=>{
     res.send('hello from back-end repo');
