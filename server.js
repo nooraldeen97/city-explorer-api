@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios');
 const server = express(); //I can use the express methods using server variable
 const weatherData = require('./data/weather.json');
 require('dotenv').config();
@@ -17,44 +18,63 @@ server.get('/test',(req,res)=>{
 })
 
 class Forecast {
-    constructor(description , date){
-        this.description=description,
-        this.date=date
+    constructor(item){
+        this.description=`Low of ${item.low_temp}, high of ${item.high_temp} with ${item.weather.description}`;
+        this.date=item.valid_date;
     }
-
-    
-    
 }
 
-//localhost:3001/weather?searchQuery=city-name&latitude=lat&longitudinal=lon
-server.get('/weather',(req,res)=>{
+    class Movie {
+        constructor(item){
+          this.title=item.title,
+          this.overview=item.overview,
+          this.average_votes=item.vote_average,
+          this.total_votes=item.vote_count,
+          this.image_ur=`https://image.tmdb.org/t/p/w500${item.backdrop_path}`,
+          this.popularity=item.popularity,
+          this.released_on=item.release_date
+        }
+    }
+    
+//localhost:3001/movies?city=usa
+server.get('/movies',(req,res)=>{
+    searchQuery=req.query.city;
+    console.log(searchQuery);
+    const movie = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${searchQuery}`
+    axios.get(movie).then(movieResult=>{
+         let movieData=movieResult.data.results.map((item)=>{
+             return new Movie(item);
+         })
+         
+         res.send(movieData);
+     })
+     .catch(err=>{
+        res.send(err.message)
+     })
+       
+})
+
+//localhost:3001/weather?searchQuery=city-name
+server.get('/weather', async(req,res)=>{
 
     let searchQuery = req.query.searchQuery;
-    // let lat = req.query.latitude;
-    // let lon = req.query.longitudinal;
-let dataForWeather= weatherData.find((item)=>{
-    if(item.city_name.toLocaleLowerCase() == searchQuery.toLowerCase())
-
-        return (item);
-    
-    })
-    try{
-        let date ;
-        let description;
-        
-        let forcastArr=dataForWeather.data.map((item)=>{
-             date = item.valid_date;
-             description = `Low of ${item.low_temp}, high of ${item.high_temp} with ${item.weather.description}`;
-            return new Forecast(date,description);
-        })
-        res.send(forcastArr)
-
-    }
-catch{
-    res.send('Error, your entered location not found')
-console.log (dataForWeather)
-
-}
+    const weatherURL =`https://api.weatherbit.io/v2.0/forecast/daily?city=${searchQuery}&key=${process.env.WEATHER_API_KEY}`
+    // let dataForWeather= weatherResult.data.find((item)=>{
+        // if(item.city_name.toLocaleLowerCase() == searchQuery.toLowerCase())
+        //     return (item);
+        // })
+         axios.get(weatherURL).then(weatherResult=>{
+             console.log(weatherResult.data);
+             
+             let forcastArr=weatherResult.data.data.map((item)=>{
+                   return new Forecast(item);
+         })
+         console.log(forcastArr)
+         res.send(forcastArr)
+            })
+            .catch(err=>{
+                res.send(err.message)
+            })
 
 })
 
