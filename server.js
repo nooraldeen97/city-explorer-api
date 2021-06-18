@@ -1,6 +1,5 @@
 const express = require('express');
 const server = express(); //I can use the express methods using server variable
-// const weatherData = require('./data/weather.json'); // this regards to lab-07
 require('dotenv').config();
 const cors = require('cors');
 server.use(cors()); //make my server opened for everyone
