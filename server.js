@@ -11,6 +11,7 @@ const weatherHandler = require('./weatherHandler')
 
 const PORT = process.env.PORT;
 
+
 server.get('/',(req,res)=>{
     res.send('hello from home page ');
 })
